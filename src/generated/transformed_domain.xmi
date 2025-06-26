@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="ASCII"?>
+<domain:Domain xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:domain="http://www.eclipse.org/sirius-web/domain" xsi:schemaLocation="http://www.eclipse.org/sirius-web/domain ../ecore/web_domain.ecore" name="extendedfamily">
+  <types name="Family">
+    <attributes name="livingAdderss"/>
+    <relations name="members" many="true" containment="true" targetType="//@types.1"/>
+  </types>
+  <types name="Person" abstract="true">
+    <attributes name="firstName"/>
+    <relations name="children" many="true" targetType="//@types.1"/>
+    <relations name="parents" many="true" targetType="//@types.1"/>
+    <relations name="mother" targetType="//@types.3"/>
+    <relations name="father" targetType="//@types.2"/>
+  </types>
+  <types name="Man" superTypes="//@types.1">
+    <attributes name="hasBeard" type="BOOLEAN"/>
+    <relations name="house" many="true" containment="true" targetType="//@types.4"/>
+  </types>
+  <types name="Woman" superTypes="//@types.1">
+    <attributes name="hasLongHair" type="BOOLEAN"/>
+    <attributes name="asdasd"/>
+  </types>
+  <types name="House">
+    <attributes name="hight" type="NUMBER"/>
+  </types>
+</domain:Domain>

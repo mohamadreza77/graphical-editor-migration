@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="ASCII"?>
+<description:Group xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:description="http://www.eclipse.org/sirius/description/1.1.0" xmlns:description_1="http://www.eclipse.org/sirius/diagram/description/1.1.0" xmlns:style="http://www.eclipse.org/sirius/diagram/description/style/1.1.0" name="extendedfamily">
+  <ownedViewpoints name="Custom Viewpoint from GMF" modelFileExtension="">
+    <ownedRepresentations xsi:type="description_1:DiagramDescription" name="Cusotm Representation from GMF" domainClass="extendedfamily::Family" enablePopupBars="true">
+      <defaultLayer name="Default">
+        <nodeMappings name="ManNode" semanticCandidatesExpression="aql:self.members" domainClass="Man">
+          <style xsi:type="style:WorkspaceImageDescription" labelSize="12" showIcon="false" labelExpression="feature:firstName" workspacePath="platform:/plugin/org.sabeghi.mohamadreza.sample.gmf_example/man.svg">
+            <borderColor xsi:type="description:SystemColor" href="environment:/viewpoint#/0/@systemColors/@entries[name='black']"/>
+            <labelColor xsi:type="description:SystemColor" href="environment:/viewpoint#/0/@systemColors/@entries[name='black']"/>
+          </style>
+        </nodeMappings>
+        <nodeMappings name="WomanNode" semanticCandidatesExpression="aql:self.members" domainClass="Woman">
+          <style xsi:type="style:WorkspaceImageDescription" labelSize="12" showIcon="false" labelExpression="feature:firstName" workspacePath="platform:/plugin/org.sabeghi.mohamadreza.sample.gmf_example/woman.svg">
+            <borderColor xsi:type="description:SystemColor" href="environment:/viewpoint#/0/@systemColors/@entries[name='black']"/>
+            <labelColor xsi:type="description:SystemColor" href="environment:/viewpoint#/0/@systemColors/@entries[name='black']"/>
+          </style>
+        </nodeMappings>
+        <nodeMappings name="HouseNode" semanticCandidatesExpression="aql:self.members->filter(extendedfamily::Man).houses" domainClass="House">
+          <style xsi:type="style:SquareDescription" labelSize="12" showIcon="false" labelExpression="feature:height">
+            <borderColor xsi:type="description:SystemColor" href="environment:/viewpoint#/0/@systemColors/@entries[name='black']"/>
+            <labelColor xsi:type="description:SystemColor" href="environment:/viewpoint#/0/@systemColors/@entries[name='black']"/>
+            <color xsi:type="description:SystemColor" href="environment:/viewpoint#/0/@systemColors/@entries[name='gray']"/>
+          </style>
+        </nodeMappings>
+        <edgeMappings name="PersonMotherEdge" sourceMapping="//@ownedViewpoints[name='Custom%20Viewpoint%20from%20GMF']/@ownedRepresentations[name='Cusotm%20Representation%20from%20GMF']/@defaultLayer/@nodeMappings[name='ManNode'] //@ownedViewpoints[name='Custom%20Viewpoint%20from%20GMF']/@ownedRepresentations[name='Cusotm%20Representation%20from%20GMF']/@defaultLayer/@nodeMappings[name='WomanNode']" targetMapping="//@ownedViewpoints[name='Custom%20Viewpoint%20from%20GMF']/@ownedRepresentations[name='Cusotm%20Representation%20from%20GMF']/@defaultLayer/@nodeMappings[name='WomanNode']" targetFinderExpression="aql:self.mother">
+          <style>
+            <strokeColor xsi:type="description:SystemColor" href="environment:/viewpoint#/0/@systemColors/@entries[name='gray']"/>
+            <centerLabelStyleDescription labelSize="12" showIcon="false" labelExpression="mothership">
+              <labelColor xsi:type="description:SystemColor" href="environment:/viewpoint#/0/@systemColors/@entries[name='black']"/>
+            </centerLabelStyleDescription>
+          </style>
+        </edgeMappings>
+        <edgeMappings name="PersonFatherEdge" sourceMapping="//@ownedViewpoints[name='Custom%20Viewpoint%20from%20GMF']/@ownedRepresentations[name='Cusotm%20Representation%20from%20GMF']/@defaultLayer/@nodeMappings[name='ManNode'] //@ownedViewpoints[name='Custom%20Viewpoint%20from%20GMF']/@ownedRepresentations[name='Cusotm%20Representation%20from%20GMF']/@defaultLayer/@nodeMappings[name='WomanNode']" targetMapping="//@ownedViewpoints[name='Custom%20Viewpoint%20from%20GMF']/@ownedRepresentations[name='Cusotm%20Representation%20from%20GMF']/@defaultLayer/@nodeMappings[name='ManNode']" targetFinderExpression="aql:self.father">
+          <style>
+            <strokeColor xsi:type="description:SystemColor" href="environment:/viewpoint#/0/@systemColors/@entries[name='gray']"/>
+            <centerLabelStyleDescription labelSize="12" showIcon="false" labelExpression="fathership">
+              <labelColor xsi:type="description:SystemColor" href="environment:/viewpoint#/0/@systemColors/@entries[name='black']"/>
+            </centerLabelStyleDescription>
+          </style>
+        </edgeMappings>
+        <edgeMappings name="HouseEdge" sourceMapping="//@ownedViewpoints[name='Custom%20Viewpoint%20from%20GMF']/@ownedRepresentations[name='Cusotm%20Representation%20from%20GMF']/@defaultLayer/@nodeMappings[name='ManNode']" targetMapping="//@ownedViewpoints[name='Custom%20Viewpoint%20from%20GMF']/@ownedRepresentations[name='Cusotm%20Representation%20from%20GMF']/@defaultLayer/@nodeMappings[name='HouseNode']" targetFinderExpression="aql:self.houses">
+          <style>
+            <strokeColor xsi:type="description:SystemColor" href="environment:/viewpoint#/0/@systemColors/@entries[name='gray']"/>
+            <centerLabelStyleDescription labelSize="12" showIcon="false" labelExpression="Some Expression for the Relationship">
+              <labelColor xsi:type="description:SystemColor" href="environment:/viewpoint#/0/@systemColors/@entries[name='black']"/>
+            </centerLabelStyleDescription>
+          </style>
+        </edgeMappings>
+      </defaultLayer>
+    </ownedRepresentations>
+  </ownedViewpoints>
+</description:Group>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="ASCII"?>
+<view:View xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:diagram="http://www.eclipse.org/sirius-web/diagram" xmlns:view="http://www.eclipse.org/sirius-web/view" xsi:schemaLocation="http://www.eclipse.org/sirius-web/diagram file:/C:/Users/Pouyan/eclipse/epsilon-2-32/runtime-SiriusSimpleVersionOfExtendedFamilyForAnalysis/odesignparser/src/ecore/web_diagram.ecore http://www.eclipse.org/sirius-web/view file:/C:/Users/Pouyan/eclipse/epsilon-2-32/runtime-SiriusSimpleVersionOfExtendedFamilyForAnalysis/odesignparser/src/ecore/web_view.ecore">
+  <descriptions xsi:type="diagram:DiagramDescription" name="Cusotm Representation from CSS Papyrus" domainType="extendedfamily::Family" titleExpression="" autoLayout="true">
+    <nodeDescriptions name="HouseNode" domainType="extendedfamily::House"/>
+    <nodeDescriptions name="ManNode" domainType="extendedfamily::Man">
+      <style xsi:type="diagram:ImageNodeStyleDescription" borderSize="4" borderLineStyle="Dash" shape="&quot;platform:/resource/demo/man.svg&quot;"/>
+      <outsideLabels labelExpression="feature:firstName" textAlign="CENTER">
+        <style fontSize="13" italic="true" bold="true" underline="true" borderSize="0"/>
+      </outsideLabels>
+    </nodeDescriptions>
+    <nodeDescriptions name="WomanNode" domainType="extendedfamily::Woman">
+      <style xsi:type="diagram:ImageNodeStyleDescription" borderSize="0" shape="&quot;platform:/resource/demo/woman.svg&quot;"/>
+      <outsideLabels labelExpression="feature:firstName" textAlign="CENTER">
+        <style fontSize="8" bold="true" borderSize="0"/>
+      </outsideLabels>
+    </nodeDescriptions>
+    <edgeDescriptions name="mothershipEdge" domainType="extendedfamily::Woman" centerLabelExpression="mothership" sourceNodeDescriptions="//@descriptions[name='Cusotm%20Representation%20from%20CSS%20Papyrus']/@nodeDescriptions[name='ManNode'] //@descriptions[name='Cusotm%20Representation%20from%20CSS%20Papyrus']/@nodeDescriptions[name='WomanNode']" targetNodeDescriptions="//@descriptions[name='Cusotm%20Representation%20from%20CSS%20Papyrus']/@nodeDescriptions[name='WomanNode']" targetNodesExpression="aql:self.mother">
+      <style fontSize="8" italic="true" bold="true" borderSize="0"/>
+    </edgeDescriptions>
+    <edgeDescriptions name="fathershipEdge" domainType="extendedfamily::Man" centerLabelExpression="fathership" sourceNodeDescriptions="//@descriptions[name='Cusotm%20Representation%20from%20CSS%20Papyrus']/@nodeDescriptions[name='ManNode'] //@descriptions[name='Cusotm%20Representation%20from%20CSS%20Papyrus']/@nodeDescriptions[name='WomanNode']" targetNodeDescriptions="//@descriptions[name='Cusotm%20Representation%20from%20CSS%20Papyrus']/@nodeDescriptions[name='ManNode']" targetNodesExpression="aql:self.father">
+      <style fontSize="13" borderSize="0" lineStyle="Dash"/>
+    </edgeDescriptions>
+    <edgeDescriptions name="ownsEdge" centerLabelExpression="owns" targetNodesExpression="">
+      <style fontSize="8" borderSize="0"/>
+    </edgeDescriptions>
+  </descriptions>
+</view:View>

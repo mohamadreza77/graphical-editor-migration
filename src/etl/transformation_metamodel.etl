@@ -1,0 +1,66 @@
+rule RootTransformation
+transform sm : EcoreModel!EPackage
+to tm : DomainModel!Domain{
+	tm.name = sm.name;
+	tm.types = sm.eClassifiers.equivalent();
+}
+
+rule EntityTransformation
+transform sm : EcoreModel!EClass
+to tm : DomainModel!Entity{
+	tm.name = sm.name;
+	if (sm.abstract == true)
+	    tm.abstract = sm.abstract;
+    for (eSuperType in sm.eSuperTypes){
+        var parent : DomainModel!Entity ::= eSuperType;
+        if (parent.isDefined()){
+            tm.superTypes.add(parent);
+        }
+    }
+
+    var r = new Bag;
+    var a = new Bag;
+    for (eStructuralFeature in sm.eStructuralFeatures){
+        if (eStructuralFeature.isTypeOf(EcoreModel!EReference)){
+            var eStructuralFeatureEquivalent = eStructuralFeature.equivalent();
+            r.add(eStructuralFeatureEquivalent);
+        }
+        else if (eStructuralFeature.isTypeOf(EcoreModel!EAttribute)){
+            var eStructuralFeatureEquivalent = eStructuralFeature.equivalent();
+            a.add(eStructuralFeatureEquivalent);
+        }
+    }
+    tm.relations = r;
+    tm.attributes = a;
+}
+
+rule RelationTransformation
+transform sm : EcoreModel!EReference
+to tm : DomainModel!Relation{
+	tm.name = sm.name;
+    var target_type : DomainModel!Entity ::= sm.eType;
+    if (target_type.isDefined()){
+        tm.targetType = target_type;
+    }
+    if (sm.upperBound == -1 or sm.upperBound > 1){
+        tm.many = true;
+    }
+    if (sm.containment == true)
+        tm.containment = sm.containment;
+}
+
+rule AttributeTransformation
+transform sm : EcoreModel!EAttribute
+to tm : DomainModel!Attribute{
+	tm.name = sm.name;
+    if (sm.lowerBound > 0){
+        tm.optional = false;
+    }
+    if ("EString".isSubstringOf(sm.eType.asString()))
+        tm.type = DomainModel!DataType#STRING;
+    else if ("EBoolean".isSubstringOf(sm.eType.asString()))
+        tm.type = DomainModel!DataType#BOOLEAN;
+    else if ("EInt".isSubstringOf(sm.eType.asString()))
+        tm.type = DomainModel!DataType#NUMBER;
+
+}

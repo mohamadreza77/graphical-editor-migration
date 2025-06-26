@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="ASCII"?>
+<view:View xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:diagram="http://www.eclipse.org/sirius-web/diagram" xmlns:view="http://www.eclipse.org/sirius-web/view" xsi:schemaLocation="http://www.eclipse.org/sirius-web/diagram file:/C:/Users/Pouyan/eclipse/epsilon-2-32/runtime-SiriusSimpleVersionOfExtendedFamilyForAnalysis/odesignparser/src/ecore/web_diagram.ecore http://www.eclipse.org/sirius-web/view file:/C:/Users/Pouyan/eclipse/epsilon-2-32/runtime-SiriusSimpleVersionOfExtendedFamilyForAnalysis/odesignparser/src/ecore/web_view.ecore">
+  <descriptions xsi:type="diagram:DiagramDescription" name="Persons Diagram" domainType="extendedfamily::Family" titleExpression="" autoLayout="true">
+    <nodeDescriptions name="ManNode" domainType="extendedfamily::Man" semanticCandidatesExpression="aql:self.members">
+      <style xsi:type="diagram:ImageNodeStyleDescription" borderSize="0" shape="/extendedfamily.design/icons/man.svg"/>
+      <outsideLabels labelExpression="feature:firstName" textAlign="CENTER">
+        <style fontSize="13" borderSize="0"/>
+      </outsideLabels>
+    </nodeDescriptions>
+    <nodeDescriptions name="WomanNode" domainType="extendedfamily::Woman" semanticCandidatesExpression="aql:self.members">
+      <style xsi:type="diagram:ImageNodeStyleDescription" borderSize="0" borderLineStyle="Dash" shape="/extendedfamily.design/icons/woman.svg"/>
+      <outsideLabels labelExpression="feature:firstName" textAlign="CENTER">
+        <style fontSize="12" bold="true" borderSize="0"/>
+      </outsideLabels>
+    </nodeDescriptions>
+    <nodeDescriptions name="HouseNode" domainType="extendedfamily::House" semanticCandidatesExpression="aql: self.members->filter(extendedfamily::Man).houses">
+      <style xsi:type="diagram:ImageNodeStyleDescription" borderSize="0" shape="/extendedfamily.design/icons/house.gif"/>
+      <outsideLabels labelExpression="feature:hight" textAlign="CENTER">
+        <style fontSize="12" borderSize="0"/>
+      </outsideLabels>
+    </nodeDescriptions>
+    <edgeDescriptions name="fatherEdge" domainType="extendedfamily::Man" centerLabelExpression="fathership" sourceNodeDescriptions="//@descriptions[name='Persons%20Diagram']/@nodeDescriptions[name='WomanNode'] //@descriptions[name='Persons%20Diagram']/@nodeDescriptions[name='ManNode']" targetNodeDescriptions="//@descriptions[name='Persons%20Diagram']/@nodeDescriptions[name='ManNode']" targetNodesExpression="aql:self.father">
+      <style fontSize="9" italic="true" bold="true" borderSize="0"/>
+    </edgeDescriptions>
+    <edgeDescriptions name="motherEdge" domainType="extendedfamily::Woman" centerLabelExpression="mothership" sourceNodeDescriptions="//@descriptions[name='Persons%20Diagram']/@nodeDescriptions[name='WomanNode'] //@descriptions[name='Persons%20Diagram']/@nodeDescriptions[name='ManNode']" targetNodeDescriptions="//@descriptions[name='Persons%20Diagram']/@nodeDescriptions[name='WomanNode']" targetNodesExpression="aql:self.mother">
+      <style fontSize="12" italic="true" borderSize="0"/>
+    </edgeDescriptions>
+    <edgeDescriptions name="houseEdge" domainType="extendedfamily::Man" centerLabelExpression="ownership" sourceNodeDescriptions="//@descriptions[name='Persons%20Diagram']/@nodeDescriptions[name='ManNode']" targetNodeDescriptions="//@descriptions[name='Persons%20Diagram']/@nodeDescriptions[name='HouseNode']" targetNodesExpression="aql:self.house">
+      <style fontSize="9" italic="true" borderSize="0" lineStyle="Dash"/>
+    </edgeDescriptions>
+  </descriptions>
+</view:View>

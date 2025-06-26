@@ -1,0 +1,112 @@
+rule RootTransformation
+transform sm : PivotModel!Viewpoint
+to tm : ModernModel!View{
+	tm.descriptions = sm.ownedRepresentations.equivalent();
+}
+
+rule REP_DES_Transformation
+transform sm : PivotModel!DiagramDescription
+to tm : ModernModel!DiagramDescription{
+	tm.name = sm.name;
+	tm.domainType = sm.domainClass;
+	tm.autoLayout = true;
+	tm.titleExpression = sm.titleExpression;
+	tm.nodeDescriptions = sm.defaultLayer.nodeMappings.equivalent();
+	tm.edgeDescriptions = sm.defaultLayer.edgeMappings.equivalent();
+}
+
+rule NodeTransformation
+transform sm : PivotModel!NodeMapping
+to tm : ModernModel!NodeDescription{
+	tm.name = sm.name;
+    tm.domainType = sm.domainClass;
+    tm.semanticCandidatesExpression = sm.semanticCandidatesExpression;
+    var style = sm.style;
+    if (style.isTypeOf(PivotModel!WorkspaceImageDescription)){
+		var styles = style.equivalents();
+		tm.style = styles.get(0);
+		tm.outsideLabels = new Sequence<ModernModel!OutsideLabelDescription>;
+		tm.outsideLabels.add(styles.get(1));
+    }
+}
+
+rule StyleTransformation
+transform sm : PivotModel!WorkspaceImageDescription
+to
+tmi : ModernModel!ImageNodeStyleDescription,
+tmo :  ModernModel!OutsideLabelDescription
+{	
+    tmi.borderSize = sm.borderSizeComputationExpression.asInteger();
+    tmi.shape = sm.workspacePath;
+    if (sm.borderLineStyle.isDefined()){
+        var sourceLineStyle = sm.borderLineStyle.asString().toLowerCase();
+        switch (sourceLineStyle){
+        	case 'dash': tmi.borderLineStyle = ModernModel!LineStyle#Dash;
+        	case 'dot': tmi.borderLineStyle = ModernModel!LineStyle#Dot;
+        	case 'dash_dot': tmi.borderLineStyle = ModernModel!LineStyle#Dash_Dot;
+        	default : tmi.borderLineStyle = ModernModel!LineStyle#Solid;
+        }
+    }
+//    tmi.borderColor = new ModernModel!FixedColor;
+//    tmi.borderColor.name = "1952d117-7d88-32c4-a839-3858e5e779ae#//@colorPalettes.1/@colors.0";
+
+    tmo.labelExpression = sm.labelExpression;
+    switch (sm.labelAlignment){
+    	case 'RIGHT':  tmo.textAlign = ModernModel!LabelTextAlign#RIGHT;
+    	case 'LEFT':  tmo.textAlign = ModernModel!LabelTextAlign#LEFT;
+    	default :  tmo.textAlign = ModernModel!LabelTextAlign#CENTER;
+    }
+
+   tmo.style = new ModernModel!OutsideLabelStyle;
+   tmo.style.fontSize = sm.labelSize;
+   tmo.style.borderSize = 0;
+   var formats = sm.labelFormat;
+   for (format in formats){
+	   switch (format.asString()){
+	    	case "bold":  tmo.style.bold = true;
+	    	case "italic":  tmo.style.italic = true;
+	    	case "underline":  tmo.style.underline = true;
+	    }
+    }
+//   tmo.style.labelColor = new ModernModel!FixedColor;
+//   tmo.style.labelColor.name = "1952d117-7d88-32c4-a839-3858e5e779ae#//@colorPalettes.1/@colors.0";
+}
+
+rule EdgeTransformation
+transform sm : PivotModel!EdgeMapping
+to tm : ModernModel!EdgeDescription{
+	tm.name = sm.name;
+	var sourceNodes = sm.sourceMapping.equivalent();
+	if (sourceNodes.size() == 1){
+		tm.domainType = sourceNodes.first().domainType;
+	} else if (sourceNodes.size() > 1){
+		tm.domainType = sourceNodes.random().domainType;
+	}
+    tm.sourceNodeDescriptions = sourceNodes ;
+    tm.targetNodeDescriptions = sm.targetMapping.equivalent();
+    tm.targetNodesExpression = sm.targetFinderExpression;
+    tm.centerLabelExpression = sm.style.centerLabelStyleDescription.labelExpression;
+	tm.style = new ModernModel!EdgeStyle;
+	if (sm.style.lineStyle.isDefined()){
+		var sourceLineStyle = sm.style.lineStyle.asString().toLowerCase();
+        switch (sourceLineStyle){
+        	case 'dash': tm.style.lineStyle = ModernModel!LineStyle#Dash;
+        	case 'dot': tm.style.lineStyle = ModernModel!LineStyle#Dot;
+        	case 'dash_dot': tm.style.lineStyle = ModernModel!LineStyle#Dash_Dot;
+        	default : tm.style.lineStyle = ModernModel!LineStyle#Solid;
+        }
+	}
+	   
+	tm.style.fontSize = sm.style.centerLabelStyleDescription.labelSize;
+   	var formats = sm.style.centerLabelStyleDescription.labelFormat;
+   	for (format in formats){
+	   	switch (format.asString()){
+	    	case 'bold':  tm.style.bold = true;
+	    	case 'italic':  tm.style.italic = true;
+	    }
+    }
+	tm.style.borderSize = 0;
+
+//	tm.style.color = new ModernModel!FixedColor;
+//	tm.style.color.href = "1952d117-7d88-32c4-a839-3858e5e779ae#//@colorPalettes.1/@colors.0";
+}

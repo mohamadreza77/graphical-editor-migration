@@ -1,0 +1,155 @@
+rule RootTransformation
+transform sm : LegacyModel!Canvas
+to tm : PivotModel!Group{
+	tm.name = sm.name;
+	
+	// nodes
+	var nodeMappings = sm.nodes.equivalent();
+	// edges
+	var edgeMappings = sm.connections.equivalent();
+	//inner edges
+	var innerEdgeMappings = findAllInnerRelations();
+	
+	var defaultLayer = new PivotModel!Layer;
+	defaultLayer.name = "Default";
+	defaultLayer.nodeMappings = new Sequence<PivotModel!NodeMapping>;	
+	defaultLayer.nodeMappings.addAll(nodeMappings);
+	defaultLayer.edgeMappings = new Sequence<PivotModel!EdgeMapping>;	
+	defaultLayer.edgeMappings.addAll(edgeMappings);
+	defaultLayer.edgeMappings.addAll(innerEdgeMappings);
+	
+	var ownedRepresentations = new Sequence();
+	ownedRepresentations.add(new PivotModel!DiagramDescription);
+	ownedRepresentations.first().defaultLayer = defaultLayer;
+	ownedRepresentations.first().name = "Cusotm Representation from GMF";
+	ownedRepresentations.first().enablePopupBars = true;
+	var ecore = LegacyModel.allInstances.select(e | e.isTypeOf(LegacyModel!Mapping)).get(0).diagram.domainModel.name;
+	ownedRepresentations.first().domainClass = ecore + "::" + LegacyModel.allInstances.select(e | e.isTypeOf(LegacyModel!Mapping)).get(0).diagram.domainMetaElement.name;
+	
+	tm.ownedViewpoints = new Sequence();
+	tm.ownedViewpoints.add(new PivotModel!Viewpoint);
+	tm.ownedViewpoints.first().ownedRepresentations = ownedRepresentations; 
+	tm.ownedViewpoints.first().name = "Custom Viewpoint from GMF"; 
+	tm.ownedViewpoints.first().modelFileExtension = "";
+	
+}
+
+rule NodeTransformation
+transform sm : LegacyModel!Node
+to tm : PivotModel!NodeMapping{
+	tm.name = sm.name + "Node";
+	var ecore = LegacyModel.allInstances.select(e | e.isTypeOf(LegacyModel!Mapping)).get(0).diagram.domainModel.name;
+	var topNodes = LegacyModel.allInstances.select(e | e.isTypeOf(LegacyModel!TopNodeReference));
+	var currentNodeMap = null;
+	for (topNode in topNodes){
+		if (topNode.ownedChild.diagramNode.name == sm.name){
+			tm.semanticCandidatesExpression = "aql:self." + topNode.containmentFeature.name;
+			tm.domainClass = topNode.ownedChild.domainMetaElement.name;
+			
+			currentNodeMap = topNode;
+			break;
+		}
+	}
+	var childNodes = LegacyModel.allInstances.select(e | e.isTypeOf(LegacyModel!ChildReference));
+	for (childNode in childNodes){
+		if (childNode.ownedChild.diagramNode.name == sm.name){
+			var parent = childNode.eContainer().eContainer();
+			var parentType = parent.ownedChild.domainMetaElement.name;
+			tm.semanticCandidatesExpression = "aql:self." + parent.containmentFeature.name + "->filter(" + ecore + "::" + parentType + ")." + childNode.containmentFeature.name;
+			tm.domainClass = childNode.ownedChild.domainMetaElement.name;
+			
+			currentNodeMap = childNode;
+			break;
+		}
+	}
+	var figure = sm.figure;
+	var actualFigure = figure.actualFigure;
+	if (actualFigure.isTypeOf(LegacyModel!SVGFigure)){
+		tm.style = new PivotModel!WorkspaceImageDescription;
+		tm.style.workspacePath = actualFigure.documentURI;
+	}else if (actualFigure.isTypeOf(LegacyModel!Rectangle)){
+		tm.style = new PivotModel!SquareDescription;
+	}
+	
+	tm.style.labelSize = 12;
+	tm.style.showIcon = false;
+	tm.style.labelExpression = "feature:" + currentNodeMap.ownedChild.labelMappings.get(0).features.get(0).name;
+	//tm.style.resizeKind = PivotModel!ResizeKind#NSEW_LITERAL;
+}
+
+
+rule EdgeTransformation
+transform sm : LegacyModel!Connection
+to tm : PivotModel!EdgeMapping{
+	tm.name = sm.name + "Edge";
+	
+	//style
+	tm.style = new PivotModel!EdgeStyleDescription;
+	tm.style.centerLabelStyleDescription = new PivotModel!CenterLabelStyleDescription;
+	tm.style.centerLabelStyleDescription.labelSize = 12;
+	tm.style.centerLabelStyleDescription.showIcon = false;
+	
+	var links = LegacyModel.allInstances.select(e | e.isTypeOf(LegacyModel!LinkMapping));
+	for (link in links){
+		if (link.diagramLink.name == sm.name){
+			//add target finder
+			tm.targetFinderExpression = "aql:self." + link.linkMetaFeature.name;
+			
+			// add label expression
+			tm.style.centerLabelStyleDescription.labelExpression = link.labelMappings.first().diagramLabel.figure.actualFigure.text;
+			
+			//add targets
+			var target = link.linkMetaFeature;
+			var nodeMappings = PivotModel.allInstances.select(e | e.isTypeOf(PivotModel!NodeMapping));
+			for (nodeMapping in nodeMappings){
+				if (nodeMapping.domainClass == target.eType.name){
+					tm.targetMapping.add(nodeMapping);
+				}
+			}
+			//add sources
+			var source = link.linkMetaFeature.eContainer();
+			if (source.abstract == false){
+				for (nodeMapping in nodeMappings){
+					if (nodeMapping.domainClass == source.name){
+						tm.sourceMapping.add(nodeMapping);
+					}
+				}
+			}else{
+				var root = source.eContainer();
+				var allClasses = root.eContents().select(e | e.isTypeOf(LegacyModel!EClass));
+				var childClasses = allClasses.select(e | e.eSuperTypes.includes(source));
+				var nonAbstractClasses = childClasses.select(e | e.abstract == false);
+				for (nodeMapping in nodeMappings){
+					for (nonAbstractClasse in nonAbstractClasses){
+						if (nodeMapping.domainClass == nonAbstractClasse.name){
+							tm.sourceMapping.add(nodeMapping);
+						}
+					}
+				}
+			}
+			
+		}
+	}
+}
+
+// other edges
+operation findAllInnerRelations() : Sequence<PivotModel!EdgeMapping>{
+	var innerEdgeMappings = new Sequence<PivotModel!EdgeMapping>;
+	var childNodes = LegacyModel.allInstances.select(e | e.isTypeOf(LegacyModel!ChildReference));
+	for (childNode in childNodes){
+		var newEdge = new PivotModel!EdgeMapping;
+		newEdge.name = childNode.ownedChild.diagramNode.name + "Edge";
+		newEdge.style = new PivotModel!EdgeStyleDescription;
+		newEdge.style.centerLabelStyleDescription = new PivotModel!CenterLabelStyleDescription;
+		newEdge.style.centerLabelStyleDescription.labelSize = 12;
+		newEdge.style.centerLabelStyleDescription.showIcon = false;
+		newEdge.sourceMapping.add(childNode.eContainer().diagramNode.equivalent());
+		newEdge.targetMapping.add(childNode.ownedChild.diagramNode.equivalent());
+		newEdge.targetFinderExpression = "aql:self." + childNode.containmentFeature.name;
+		newEdge.style.centerLabelStyleDescription.labelExpression = "Some Expression for the Relationship";
+		
+				
+		innerEdgeMappings.add(newEdge);
+	}
+	return innerEdgeMappings;
+}
